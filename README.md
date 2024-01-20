@@ -17,3 +17,56 @@
 즉 의존성이란 **하나의 객체가 자신이 해야 하는 일을 하기 위해 다른 객체의 도움이 필수적인 관계**를 의미한다.
 
 스프링은 이러한 문제를 해결하기 위해 다양한 방식으로 필요한 객체를 찾아 사용할 수 있도록 XML 설정이나 자바 설정 등을 이용한다.
+
+- ### Spring 설정 파일
+
+스프링 프레임워크는 자체적으로 객체를 생성, 관리하면서 필요한 곳으로 객체를 주입하는 역할을 하는데 이를 위해 설장 파일이나 어노테이션등을 이용해야한다.
+
+스피링이 관리하는 객체들은 빈(Bean)이라는 이름으로 불리는데 프로젝트 내에서 어떤 빈들을 어떻게 관리할 것인지 설정하는 설정파일을 작성한다.
+스프링 빈 설정은 XML을 이용하거나 별도의 클래스를 이용하는 자바 설정이 가능하다. 예제에서는 XML 설정을 이용하도록 하고, 스프링 부트에서 자바 설정을 이용하고자 한다.
+
+> 스프링 빈 설 정 테스트
+
+- `@Autowired`
+
+스프링에서 사용하는 의존성 주입 관련 어노테이션으로 해당 타입의 빈이 존재하면 여기서 주입하기를 원한다 는 의미
+- `@ExtendWith(SpringExtensition.class)`
+
+JUnit5 버전에서 'spring-test'를 이용하기 위한 설정
+- `@ContextConfiguration`
+
+스프링 설정 정보를 로딩하기 위해 사용.
+현재 XML로 설정되어 있기 때문에 locations 송석을 사용.
+자바 설정을 사용하는 경우에는 class 속성을 이용한다.
+
+> ApplicationContext와 빈
+
+서블릿이 존재하는 공간을 서블릿 건텍스트(Servlet Context)라 한 것 처럼, 스프링에서 **'빈(Bean)'**이라고 부르는 객체들을 관리하기 위해 ApplicationContext를 활용한다.
+
+예제에서 `ApplicaiotnContext`는 root-context.xml을 이용해 스프링이 실행되고 ApplicationContext 객체가 생성된다.
+root-context.xml에서 SampleService와 SampleDAO가 <bean>으로 지정되어있기 떄문에 해당 클래스의 객체를 생성해서 관리한다.
+![img_1.png](img_1.png)
+
+> `@Autowired`의 의미와 필드 주입
+
+테스트에서 `@Autowired`가 처리된 부분에 맞는 빈(Bean)이 존재하는지 확인하고 이를 테스트 코드 실행 시 주입하게 된다.
+멤버 변수에 직접 `@Autowired`를 선언하는 방식을 **필드 주입(Field Injection)** 방식이라고 한다.
+`@Autowired`를 이용해 필요한 타입을 주입받을 수 있다.
+
+> `<context:compoenet-scan>`
+
+스프링은 직접 클래스를 작성하거나, 객체를 생성하지 않는다.
+이 역할은 스프링 내부에서 진행되며, ApplicaiotnContext가 생성된 객체들을 관리한다.
+
+- ### `@Service`, `@Repository`
+
+서블릿에서도 `@WebServlet`이나 `@WebFilter`와 같이 다양한 어노테이션이 존재하듯, 스프링 프레임워크는 애플리케이션 전체를 커버하기 때문에 다양한 종류의 어노테이션을 사용한다.
+
+> - `@Controller` : MVC의 컨트롤러를 위한 어노테이션
+> - `@Service` : 서비스 계층의 객체를 위한 어노테이션
+> - `@Repository` : DAO와 같은 객체를 위한 어노테이션
+> - `@Compoenet` : 일반 객체나 유틸리티 객체를 위한 어노테이션
+
+SampleDAO는 클래스의 객체가 스프링에서 빈(Bean)으로 관리될 수 있도록 `@Repository`라는 어노테이션 추가한다.
+SampleService에는 `@Service` 어노테이션을 추가한다.
+이후 테스트 코드를 실행해 정상적으로 동작하는지 확인한다.
