@@ -10,7 +10,7 @@
 
 스프링 프레임워크는 가장 중요한 '코어'역할을 하는 라이브러리와 여러 추가 라이브러리를 결합하는 형태로 프로젝트를 구성하는데 가장 대표적인 웹 MVC로 구현을 쉽게할 수 있는 'Spring Web MVC'나 JDBC를 쉽게 처리할 수 있는 `MyBatis`를 연동하는 `mybatis-spring`과 같은 라이브러리가 존재한다.
 
-- ### 의존성 주입
+- ## 의존성 주입
 의존성 주입은 어떻게 하면 **'객체와 객체 간의 관계를 더 유연하게 유지할 것인가?'** 에 대한 고민으로 객체의 생성과 관계를 효과적으로 분리할 수 있는 방법에 대한 고민이다.
 
 예를 들어 이전의 장의 모든 컨트롤러들은 TodoService, MemberService와 같은 서비스 객체를 이용해ㅑ 한다. 이 경우 컨트롤러는 서비스 객체에 의존적이라고 표현한다.
@@ -18,7 +18,7 @@
 
 스프링은 이러한 문제를 해결하기 위해 다양한 방식으로 필요한 객체를 찾아 사용할 수 있도록 XML 설정이나 자바 설정 등을 이용한다.
 
-- ### Spring 설정 파일
+- ## Spring 설정 파일
 
 스프링 프레임워크는 자체적으로 객체를 생성, 관리하면서 필요한 곳으로 객체를 주입하는 역할을 하는데 이를 위해 설장 파일이나 어노테이션등을 이용해야한다.
 
@@ -64,9 +64,168 @@ root-context.xml에서 SampleService와 SampleDAO가 <bean>으로 지정되어�
 
 > - `@Controller` : MVC의 컨트롤러를 위한 어노테이션
 > - `@Service` : 서비스 계층의 객체를 위한 어노테이션
-> - `@Repository` : DAO와 같은 객체를 위한 어노테이션
+> - `@Repository` : DAO와 같은 객체를 위한 어노테이션 //객체를 스프링의 빈(Bean)으로 처리
 > - `@Compoenet` : 일반 객체나 유틸리티 객체를 위한 어노테이션
 
 SampleDAO는 클래스의 객체가 스프링에서 빈(Bean)으로 관리될 수 있도록 `@Repository`라는 어노테이션 추가한다.
 SampleService에는 `@Service` 어노테이션을 추가한다.
 이후 테스트 코드를 실행해 정상적으로 동작하는지 확인한다.
+
+> ### 생성자 주입 방식
+
+생성자 주입 방식은 다음과 같은 규칙으로 작성된다.
+
+- 주입 받아야 하는 객체의 변수는 final로 작성한다.
+- 생성자를 이용해 해당 변수를  생성자의 파라미터로 지정한다.
+
+생성자 주입 방식은 객체를 생성할 때 문제가 발생하는지 미리 확인할 수 있기 때문에 필드 주입이나 Setter 주입 방식보다 선호되는 방식이다.
+Lombok에서는 `@RequiredArgsConstructor`를 이용하면 필요한 생성자 함수를 자동으로 작성할 수 있다.
+
+> ### 인터페이스를 이용한 느슨한 결합(loose coupling)
+
+스프링이 의존성 주입을 가능하게 하지만 유연한 프로그램을 설계하기 위해서는 인터페이스를 이용해 다른 클래스의 객체도 쉽게 변경할 수 있도록 해야한다.
+인터페이스와 같이 추상화된 타입을 이용하면 이러한 문제를 피할 수 있다.
+인페이스를 이용하면 실제 객체를 모르고 타입만 이용해 코드를 작성하는 일이 가능하기 때문이다.
+
+- #### 하나의 인터페이스를 두개 이상의 객체를 공유할 때 
+1. `@Primary` 어노태이션을 지정하여 우선순위를 부여한다.
+2. `@Qualifier('상태')` 어노테이션을 지정하여 특정 상황에서 실행될 수 있도록 한다. '상태'는 주로 'normal'이 사용된다.
+
+> ### 스프링의 Bean으로 지정되는 객체들
+모든 클래스의 객체가 Bean으로 처리되는 것은 아니다. <br>
+Bean으로 등록되는 객체는 **'핵심 배역'** 을 하는 객체들로 오랜 시간 동안 프로그램 내에 상주하면서 중요한 역할을 하는 '역할' 중심의 객체들이다. (DAO) <br>
+DTO나 VO같이 '데이터'에 중점을 두고 설계된 객체들은 Bean으로 등록하지 않든다는 것이다.
+
+> ### XML이나 어노테이션으로 처리하는 객체
+Bean으로 처리할 때 XML 설정을 이용하거나 어노테이션으로 처리할 수 있다. 이에 대한 기준은 **'코드를 수정할 수 있는가'** 로 판단한다.<br>
+예로 jar파일로 추가하는 클래스의 객체를 Bean으로 처리해야한다면 해당 코드가 존재하지 않기 때문에 어노테이션을 추가할 수 없다는 문제가 생긴다. <br>
+이러한 객체들은 XML에서 <bean>을 이용해 처리하고, 직접 작성되는 클래스는 어노테이션을 이용한다.
+
+- ## 웹 프로젝트를 위한 스프링 세팅
+
+스프링 구조를 보면 ApplicationContext라는 객체가 존재하고 Bean으로 등록된 객체들은 ApplicationContext 내에 생성되어 관리되는 구조이다.
+
+![img_2.png](img_2.png)
+
+이렇게 만들어진 ApplicationContext가 웹 애플리케이션에서 동작하려면 웹 애플리케이션이실행될 때 스프링을 로딩해 웹 애플리케이션 내부에 ApplicatoinContext를 생성해야 한다.<br>
+이를 위해 web.xml을 이용해 리스너('spring-webmvc')를 설정해야한다. 
+
+-log4j2.xml 설정
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Configuration status="INFO">
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout charset="UTF-8" pattern="%d{hh:mm:ss} %5p [%c] %m%n"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <!--스프링 관련 로거 설정-->
+        <logger name="org.springframework" level="INFO" additivity="false">
+            <appender-ref ref = "console" />
+        </logger>
+        <logger name="org.zerock" level="INFO" additivity="false">
+            <appender-ref ref="console"/>
+        </logger>
+
+        <Root level="info">
+            <AppenderRef ref="console"/>
+        </Root>
+    </Loggers>
+</Configuration>
+```
+log4j2.xml 파일을 다음과 같이 수정하여 springframework이 정상적으로 작동되는지 log를 통해 확인한다.
+
+![img_3.png](img_3.png)
+
+console이 대소문자 영향을 받으니 유의해야 한다.
+
+>## DataSource 구성
+
+데이터 베이스는 이전과 같이 Mariadb를 이용하고 HiakriCP를 사용한다.
+
+- ### 기본 세팅
+
+```build.gradle
+//DataSource
+    // https://mvnrepository.com/artifact/org.mybatis/mybatis
+    implementation group: 'org.mybatis', name: 'mybatis', version: '3.5.15'
+    // https://mvnrepository.com/artifact/org.mariadb.jdbc/mariadb-java-client
+    implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '3.2.0'
+    // https://mvnrepository.com/artifact/com.zaxxer/HikariCP
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '5.1.0'
+    // https://mvnrepository.com/artifact/org.mybatis/mybatis-spring
+    implementation group: 'org.mybatis', name: 'mybatis-spring', version: '3.0.3'
+
+    //modelmapper
+    // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.0'
+
+    //hiberante validator Engine
+    // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '8.0.1.Final'
+
+    //jstl
+    // https://mvnrepository.com/artifact/jakarta.servlet.jsp.jstl/jakarta.servlet.jsp.jstl-api
+    implementation group: 'jakarta.servlet.jsp.jstl', name: 'jakarta.servlet.jsp.jstl-api', version: '3.0.0'
+    // https://mvnrepository.com/artifact/org.eclipse.jetty/glassfish-jstl
+    implementation group: 'org.eclipse.jetty', name: 'glassfish-jstl', version: '11.0.18'
+```
+위 코드를 build.gradle에 추가한다.
+
+- ### root-context.xml과 HikariCP 설정
+
+이전에는 HikariCP 설정하기 위해 ConnectionUtil클래스를 설정했다.
+하지만 스프링에서는 이 설정을 Bean으로 처리해야 하기에 root-context.xml을 이용해 HikariConfig와 HikariDataSource 객체를 설정한다.
+
+```xml
+    <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <property name="driverClassName" value="org.mariadb.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mariadb://localhost:3308/webdb"/>
+        <property name="username" value="webuser"/>
+        <property name="password" value="webuser"/>
+        <property name="dataSourceProperties">
+            <props>
+                <prop key="cachePrepStmts">true</prop>
+                <prop key="prepStmtCacheSize">250</prop>
+                <prop key="prepStmtCacheSqlLimit">2048</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <constructor-arg ref="hikariConfig"/>
+    </bean>
+```
+
+위 코드를 root-context.xml에 추가하여 설정을 완료한다.
+
+> ## 4.2 MyBatis와 스프링 연동
+
+- ### MyBatis란
+
+MyBatis는 'Sql Mapping Framework'라 표현된다.<br>
+'Sql Mapping'은 SQL의 실행 결과를 객체지향으로 '매핑'해 준다는 뜻이다.
+
+이를 이용하면 기존 SQL을 그대로 사용할 수 있고, 다음과 같은 장점이 있다.
+
+> - PreparedStatement/ResultSet 처리 - 기존 프로그램을 작성해 하나씩 처리해야 하는 파라미터, ResultSet의 getXXX()를 MyBatis가 알아서 처리한다.
+> - Connection/PreparedStatement/ResultSet의 close()처리 - MyBatis와 스프링을 연동해 사용하면 자동으로 close() 처리한다.
+> - SQL의 분리 - MyBatis를 이용해여 별도의 파일이나 어노테이션 등을 이용해 SQL을 선언한다. 파일의 경우 SQL을 별도의 파일로 분리해 운영할 수 있다.
+
+- ### MyBatis와 Spring 연동 방식
+
+MyBatis는 단독으로 실행 가능한 독립적인 프레임워크지만 Spring에서 제공하는 라이브러리와 API를 통해 쉽게 연동할 수 있다.
+라이브러리를 이용하는지 여부에 따라 다음과 같은 방식 중 하나로 개발이 가능하다.
+
+> - MyBatis를 단독으로 개발하고 스프링에서 DAO를 작성해서 처리하는 방식
+> > 기존의 DAO에서 SQl의 처리를 MyBatis를 이용하는 구조. 완전히 MyBtis와 Spring Framework를 독립적인 존재로 보고 개발하는 방식
+> - MyBatis와 Spring을 연동하고 Mapper interface만 이용하는 방식
+> > 'mybatis-spring'라이브러리를 이용해 스프링이 데이터베이스 전체에 대한 처리를 하고 MyBtis는 일부 기능 개발에 활용하는 방식. 개발 시에는 Mapper 인터페이스라는 방식을 이용해 인터페이스만으로 모든 개발이 가능한 방식.
+
+MyBatis를 이용하려면 다음과 같은 라이브러리가 필요하다.
+- Spring 관련 : spring-jdbc, spring-tx
+- MyBatis 관련 : mybatis, mybatis-spring
