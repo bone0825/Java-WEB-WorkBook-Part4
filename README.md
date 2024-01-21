@@ -229,3 +229,24 @@ MyBatis는 단독으로 실행 가능한 독립적인 프레임워크지만 Spri
 MyBatis를 이용하려면 다음과 같은 라이브러리가 필요하다.
 - Spring 관련 : spring-jdbc, spring-tx
 - MyBatis 관련 : mybatis, mybatis-spring
+
+MyBatis 관련 라이브러리(mybatis, mybatis-spring)을 build.gradle에 추가한다.
+또한 MyBatis를 이용하기 위해 HikariDataSource를 이용해 SqlSessionFactory라는 Bean을 root-context.xml에 설정한다.
+
+MyBatis는 SQL파일을 별도로 처리할 수 있지만, 인터페이스와 어노테이션만으로도 처리가능하다.
+`@Select()` 어노테이션을 사용해 쿼리를 사용할 수있다. 다만 ';'을 이용하지 않는 다는 점에 유의해야 한다.
+
+이렇게 작성된 인터페이스를 Mapper 인터페이스라고 한다. 메퍼 인터페이스를 설정했는지 `<mybatis:scan>`태그를 이용해 root-context.xml에 등록한다.
+
+- ### XML로 SQL 분리
+
+MyBatis를 이용할 때 SQL은 @Select와 같은 어노테이션을 이용해 사용하기도 한다. 하지만 대부분은 SQL을 별도의 파일로 분리하는 것을 권장한다.
+XML과 Mapper interface를 결합할 때는 다음과 같은 과정으로 작성한다.
+
+> - 매퍼인터페이스 정의, 메소드 선언
+> - 해당 XML파일 작성 `<select>`와 같은 태그를 이용해 SQL 작성
+> - `<select>`,`<insert> 등의 태그에 id 속상 값을 매퍼 인터페이스의 메소드 이름과 같게 작성.
+
+XML파일을 작성할 때 `<mapper>`태그의 namespace 속성을 반드시 매퍼 인터페이스의 이름과 동일하게 지정해야한다.
+`<select>`태그는 반드시 resultType이나 resultMap이라는 속성을 지정해야한다.
+마지막으로 root-context에 있는 MyBatis 설정에 XML파일 인식하도록 설정을 추가한다.
