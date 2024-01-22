@@ -306,7 +306,51 @@ prefix와 suffix의 내용을 보면 MVC에서 사용한 WEB-INF경로와 '.jsp'
 > - 메소드의 리턴타입도 void, String, 객체 등 다양한 타입을 사용할 수 있다.
 
 사용한 어노테이션
-- `@GetMapping` : 경로에 대한 GET방식 요청 처리
+- `@GetMapping` : 경로에 대한 GET방식 요청 처리, 파라미터를 자동을 수집하고 변환한다.(`@RequestParam` 필요)
 - `@RequestMapping` : 특정한 경로의 요청 지정, method 속성을 통해 GET/POST 방식 구분 
 - `@PostMapping` : 경로에 대한 POST방식 요청 처리
 
+> Model 파라미터
+
+MVC에서 JSP로 데이터를 전달하기 위해 순수 servlet에서는 request.setAttribute()를 이용했따.
+스프링 MVC 방식에서는 Model이라는 객체를 이용해 처리한다. (model.addAttrivute())
+
+> RedirectAttribute와 리다이렉션
+
+PRG패턴을 처리하기 위해 스프링에서는 RedirectAttributes라는 타입을 파라미터로 추가해 사용한다.<br>
+리다이렉트 하기 위해 `redirect:`라는 접두어를 붙여 문자열로 반환한다.
+
+- `.addAttribute()` : 특정 데이터를 전달
+- `.addFlashAttribute()` : 웹 주소에는 보이지 않지만 데이터를 JSP로 보낸다. 일회용으로 사용됨으로 새로고침하면 데이터가 존재하지 않는다.
+
+>컨트롤러 메서드 리턴 타입
+
+- `void` : 상황에 관계 없이 동일한 화면 보여줌
+- 문자열 : 상황에 따라 다른 화면을 보여주는 경우 (`redirect:` - 리다이렉션 이용 / `forward:` - 브라우저 URL은 고정하고 내부적으로 다른 URL 처리)
+- `ResponseEntity` : JSON타입을 활용할 때 사용
+
+> 컨트롤러 선언부에 사용하는 어노테이션
+
+- @Controller : 스프링 빈의 처리됨을 명시
+- @RestController : REST 방식의 처리를 위한 컨트롤러
+- @RequestMapping : 특정 URL 패턴에 맞는 컨트롤러인지 명시
+
+> 메서드 선언부에 사용하는 어노테이션
+
+- @Get/Post/Delete/Put + Mapping : HTTp 전송 방식에 따라 해당 메소드를 지정하는 경우.
+- @RequestMapping : GET/POST방식 모두를 지원하는 경우
+- @ResonseBody : REST 방식에서 사용
+
+> 메서드 파라미터에 사용하는 어노테이션
+
+- @RequestParam : Request에 있는 특정한 이름의 데이터를 파라미터로 받아 처리하는 경우
+- @PathVariable : URL 결로의 일부를 변수로 삼아서 처리
+- @ModelAttribute : 해당 파라미터는 반드시 Model에 포함되어 View로 전달됨 명시
+- 기타 : @SessionAttribute, @Valid, @RequestBody, ...
+
+<br>
+
+- ### 스프링 MVC 예외처리
+
+일반적으로 스프링 MVC 컨트롤러에서 발생하는 예외처리 방식은 `@ControllerAdvice`를 이용하는 것이다. <br>
+`@ControllerAdvice`는 컨트롤러에서 발생하는 예외에 맞게 처리할 수 있는 기능을 제공하는데 @ControllerAdvice가 선언된 클래스 역시 스프링의 Bean으로 처리된다.
