@@ -15,8 +15,10 @@
     <!--InternalResourceViewResolver는 스프링 mvc에서 제공하는 view를 어떻게 결정하는지에 대한 설정 담당-->
     <!--prefix와 suffix를 통해 /WEB-INFO/~~~.jsp-->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="prefix" value="/WEB-INF/views/"/>
+        <property name="prefix" value="/WEB-INF/view/"/>
         <property name="suffix" value=".jsp"/>
     </bean>
+
+    <context:component-scan base-package="org.zerock.springex.controller"/>
 
 </beans>

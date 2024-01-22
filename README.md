@@ -250,3 +250,63 @@ XML과 Mapper interface를 결합할 때는 다음과 같은 과정으로 작성
 XML파일을 작성할 때 `<mapper>`태그의 namespace 속성을 반드시 매퍼 인터페이스의 이름과 동일하게 지정해야한다.
 `<select>`태그는 반드시 resultType이나 resultMap이라는 속성을 지정해야한다.
 마지막으로 root-context에 있는 MyBatis 설정에 XML파일 인식하도록 설정을 추가한다.
+
+> ## 4.3 스프링 Web MVC 기초
+
+- ### 스프링 Web MVC 특징
+
+스프링 MVC가 기존 구조에 약간의 변화를 주는 부분은 다음과 같다.
+
+> - Front-Controller 패턴을 이용해 모든 흐름의 시전/사후 처리를 가능하도록 설계됨
+> - 어노테이션을 적극적으로 활용해 최소한의 코드로 많은 처리가 가능
+> - HttpServletRequest/HttpServletResponse를 이용하지 않아도 될 만큼 추상화된 방식으로 개발
+
+ ![img_4.png](img_4.png)
+ 
+> #### DispatcherServlet과 Front Controller
+
+스프링 MVC에서 가장 중요한 사실은 모든 요청(Request)이 반드시 DispatcherServlet이라는 존재를 통해 실행된다는 사실이다.
+
+Front-Controller패턴(퍼사드 패턴)을 이용하면 모든 요청이 반드시 하나의 객체를 지나 처리되기 떄문에 모든 공통적인 처리를 프론트 컨트롤러에서 처리할 수 있다.
+
+![img_5.png](img_5.png)
+
+이때 DispatcherServlet이 FrontController 역할을 수행한다.
+프론트 컨트롤러가 사전/사후에 대한 처리를 하게 되면 중간에 매번 다른 처리를 하는 부분만 별도로 처리하는 구조를 만든다.
+이를 스프링에서는 `@Controller`를 이용해 처리한다.
+
+- ### Spring MVC 사용하기
+
+일반적으로 3티어 구조를 분리하듯 웹 영역을 다루기 위해 servlet-context.xml 파일을 생성한다.
+또한 webapp 폴더 아래 'resource' 폴더를 생성해 정적 파일들을 관리한다.
+
+> servlet-context.xml 설정
+
+`<mvc:annotation-driven>`설정은 스프링 MVC 설정을 어노테이션 기반으로 처리한다는 의미와 스프링 MVC의 여러 객체들을 자동으로 스프링의 Bean으로 등록하게 하는 기능이다.<br>
+`<mvc:resources>` 설정은 이미지나 html과 같이 정적인 파일의 경로를 지정한다. 이때 location 속성은 webapp 폴더에 만들어둔 폴더를 의미한다.
+
+InternalResourceViewResolver라는 이름의 클래스로 Bean이 설정되어 있는데 이는 MVC에서 제공하는 뷰(view)를 어떻게 결정하는지에 대한 설정을 담당한다.<br>
+prefix와 suffix의 내용을 보면 MVC에서 사용한 WEB-INF경로와 '.jsp'라는 확장자를 지정한 것을 확인할 수 있다.
+
+> web.xml의 DispatcherServlet 설정
+
+프론트 컨트롤러 역할의 DispatcherServlet을 설정을 web.xml을 이용해 처리한다.
+
+`<servlet>`설정은 DispatcherServlet을 등록하는데 로딩할 때 servlet-context.xml을 이용하도록 설정한다. load-on-startup 설정의 경우 톰캣 로딩 시 클래스를 미리 로딩해 두기 위한 설정이다.<br>
+`<servlet-mapping>`설정은 DispatcherServlet이 모든 경로의 요청에 대한 처리를 담당하기에 '/'로 지정한다.
+
+- ### 스프링 MVC 컨트롤러
+
+스프링 MVC 컨트롤러는 전통적인 자바 클래스 구현 방식과 여러모로 상당히 다르다<br>
+과거 많은 프레임워크들은 상속이나 인터페이스를 기반으로 구현되는 방식을 선호했다면, 스프링 MVC의 컨트롤러는 다음과 같은 점들이 다르다
+
+> - 상속이나 인터페이스를 구현하는 방식을 사용하지 않고 어노테이션만으로 처리 가능
+> - 오버라이드 없이 필요한 메소드들을 정의
+> - 메소드의 파라미터를 기본 자료형이나 객체 자료형을 마음대로 지정
+> - 메소드의 리턴타입도 void, String, 객체 등 다양한 타입을 사용할 수 있다.
+
+사용한 어노테이션
+- `@GetMapping` : 경로에 대한 GET방식 요청 처리
+- `@RequestMapping` : 특정한 경로의 요청 지정, method 속성을 통해 GET/POST 방식 구분 
+- `@PostMapping` : 경로에 대한 POST방식 요청 처리
+

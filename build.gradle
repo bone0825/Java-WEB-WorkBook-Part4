@@ -19,6 +19,9 @@ targetCompatibility = '17' //spring6 부터는 17 버전부터 실행 가능
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    processResources {
+        duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.INCLUDE
+    }
 }
 
 dependencies {
