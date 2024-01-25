@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+
 @Builder
 @Data
 @AllArgsConstructor
@@ -27,6 +30,13 @@ public class PageRequestDTO {//페이지 이동 정보
 
     private String link;
 
+    private String[] types; //검색 조건
+    private String keyword; //검색 sodyd
+    private boolean finished; //완료 유무
+    private LocalDate from; //검색 시간
+    private LocalDate to; //검색 시간
+
+
     public int getSkip(){
         return (page-1) * 10;
     }
@@ -39,5 +49,12 @@ public class PageRequestDTO {//페이지 이동 정보
             link = builder.toString();
         }
         return link;
+    }
+
+    public boolean checkType(String type){
+        if(types == null || types.length == 0){
+            return false;
+        }
+        return Arrays.stream(types).anyMatch(type::equals);
     }
 }

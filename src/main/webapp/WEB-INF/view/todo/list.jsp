@@ -37,6 +37,37 @@
             </nav>
         </div>
     </div>
+<%--    검색 파트--%>
+    <div class="row content">
+        <div class="col">
+            <div class="card-body">
+                <h5 class="card-title">Search</h5>
+                <form action="/todo/list" method="get">
+                    <input type="hidden" name="size" value="${pageRequestDTO.size}">
+                    <div class="mb-3">
+                        <input type="checkbox" name="finished" ${pageRequestDTO.finished?"checked":""}> 완료여부
+                    </div>
+                    <div class="mb-3">
+                        <input type="checkbox" name="types" value="t" ${pageRequestDTO.checkType("t")?"checked":""}> 제목
+                        <input type="checkbox" name="types" value="w" ${pageRequestDTO.checkType("w")?"checked":""}> 작성자
+                        <input type="text" name="keyword" class="form-control" value='<c:out value="${pageRequestDTO.keyword}"/> '>
+                    </div>
+                    <div class="input-group mb-3 dueDateDiv">
+                        <input type="date" name="from" class="form-control" value="${pageRequestDTO.from}">
+                        <input type="date" name="to" class="form-control" value="${pageRequestDTO.to}">
+                    </div>
+                    <div class="input-group mb-3 dueDateDiv">
+                        <div class="input-group mb-3">
+                            <div class="float-end">
+                                <button class="btn btn-primary" type="submit" id="search-input">Search</button>
+                                <button class="btn btn-info clearBtn" type="reset">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="row content">
         <div class="col">
             <div class="card">
@@ -89,10 +120,10 @@
                                 </c:if>
                             </ul>
                         </nav>
-                            <button type="button" class="btn btn-primary">Regist Todo</button>
+                            <button type="button" class="btn btn-primary" id="regist-button">Regist Todo</button>
                     </div>
                     <script>
-                        document.querySelector('.btn-primary').addEventListener("click",function (e){
+                        document.getElementById("regist-button").addEventListener("click",function (e){
                             e.preventDefault()
                             e.stopPropagation()
 
@@ -109,6 +140,12 @@
 
                             self.location = `/todo/list?page=\${num}`
                         },false)
+                        document.querySelector(".clearBtn").addEventListener("click",function (e){
+                            e.preventDefault()
+                            e.stopPropagation()
+
+                            self.location =`/todo/list`
+                        })
                     </script>
                 </div>
             </div>
